@@ -6,6 +6,7 @@ import (
 
 	"github.com/KitlerUA/xlsxparser/parser"
 	"github.com/raedahgroup/godcr/app/config"
+
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/qml"
@@ -17,6 +18,13 @@ type QmlBridge struct {
 
 	_ func(detText string)       `signal:sendToQml`
 	_ func(fileName, dir string) `slot:sendToGo` //only slots can return something
+	_ Config                     `property:"config"`
+}
+
+type Config struct {
+	core.QObject
+
+	_ string `property:"name"`
 }
 
 // triggered after program execution is complete or if interrupt signal is received
@@ -30,7 +38,7 @@ var opError error
 
 func main() {
 
-	//var a = "initial"
+	var a = "initial"
 
 	appConfig, args, parseroption, err := config.LoadConfig(true)
 	if err != nil {
@@ -38,9 +46,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	if appConfig == nil {
-		fmt.Fprintf(os.Stderr, "unexpected command or flag in %s mode: %s\n")
-		os.Exit(1)
+	a = args.ConfFileOptions.AppDataDir
+
+	if appConfig != nil {
+		fmt.Println("unexpected command or flag in %s mode: %s\n")
+		//fmt.Fprintf(os.Stderr, "unexpected command or flag in %s mode: %s\n")
+		//os.Exit(1)
 	}
 
 	if args.ConfFileOptions.AppDataDir == " " {
@@ -52,8 +63,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	conf := NewConfig(nil)
+	conf.SetName(a)
+	/*conf.ConnectNameChanged(func(n string) {
+		println("new name:", n)
+	})*/
+
 	var qmlBridge *QmlBridge
 	qmlBridge = NewQmlBridge(nil)
+	qmlBridge.SetConfig(conf)
 
 	// Create application
 	app := gui.NewQGuiApplication(len(os.Args), os.Args)
@@ -67,6 +85,10 @@ func main() {
 	// Create a QML application engine
 	engine := qml.NewQQmlApplicationEngine(nil)
 	engine.RootContext().SetContextProperty("qmlBridge", qmlBridge)
+	//engine.RootContext().SetContextProperty("Person", "setting")
+	/*context := engine.Context()
+	context.SetVar("person", &Person{Name: "Ale"})*/
+
 	qmlBridge.ConnectSendToQml(func(detText string) {
 
 	})

@@ -12,12 +12,14 @@ ApplicationWindow {
     minimumHeight: 400
 
     Column {
-        anchors.centerIn: parent
+        anchors.left: parent
+        topPadding: 35
+        leftPadding: 15
         Row {
-            spacing: 10
+            spacing: 40
             Button {
                 text: "Check Balance"
-                onClicked: fileDialog.open()
+                /*onClicked: fileDialog.open()*/
             }
             /*TextField {
                 id: inputFile
@@ -27,10 +29,10 @@ ApplicationWindow {
             }*/
         }
         Row {
-            spacing: 10
+            spacing: 25
             Button {
                 text: "Receive"
-                onClicked: dirDialog.open()
+               /* onClicked: dirDialog.open()*/
             }
             /*TextField {
                 id: outputDirectory
@@ -40,16 +42,73 @@ ApplicationWindow {
             }*/
         }
         Row {
+            spacing: 25
             Button {
                 text: "Send"
-                onClicked: {
+                /*onClicked: {
                     qmlBridge.sendToGo(inputFile.text, outputDirectory.text)
+                }*/
                 }
+                TextField {
+                id: outputDirectory
+                width: 200
+                placeholderText: "Enter Amount"
+                selectByMouse: false
+                validator: DoubleValidator{bottom: 0; top: 200000;}
+                
+            
             }
         }
+
+        Row { 
+                spacing: 25
+                topPadding: 45
+            Text {
+                    id: configurationText
+                    text: "godcr configuration file location:"
+                    font.family: "DejaVuSans"
+                    font.pixelSize: 16
+                    /*width: flick.width
+                    height: flick.height
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    anchors.fill: parent*/
+                    textFormat: Qt.RichText
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignJustify
+                    verticalAlignment: Text.AlignVCenter
+                    /*leftPadding: 10
+                    topPadding: 15
+                    bottomPadding: 10*/
+                    onTextChanged: {
+                        popup.contentWidth = implicitWidth
+                        popup.contentHeight = implicitHeight>49+okBut.width?implicitHeight:50+okBut.width
+                    }
+                 }
+                Text {
+                    id: statuText
+                    text: qmlBridge.config.name
+                    font.family: "DejaVuSans"
+                    font.pixelSize: 16
+                    /*width: flick.width
+                    height: flick.height
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    anchors.fill: parent*/
+                    textFormat: Qt.RichText
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignJustify
+                    verticalAlignment: Text.AlignVCenter
+                    /*leftPadding: 10
+                    topPadding: 15
+                    bottomPadding: 10*/
+                    onTextChanged: {
+                        popup.contentWidth = implicitWidth
+                        popup.contentHeight = implicitHeight>49+okBut.width?implicitHeight:50+okBut.width
+                    }
+
+                }
     }
 
-    FileDialog {
+    /*FileDialog {
         id: fileDialog
         visible : false
         title: "Please, choose a file"
@@ -69,9 +128,9 @@ ApplicationWindow {
         onRejected: {
             console.log("Canceled")
         }
-    }
+    }*/
 
-    FileDialog {
+    /*FileDialog {
         id: dirDialog
         visible : false
         selectFolder: true
@@ -89,8 +148,8 @@ ApplicationWindow {
             var cleanPath = decodeURIComponent(path);
             outputDirectory.text = cleanPath+"/"
         }
-    }
-    Popup {
+    }*/
+   /* Popup {
         id: popup
         x: window.width/2 - width/2
         y: window.height/2 - height/2
@@ -162,7 +221,7 @@ ApplicationWindow {
                 }
             }
         }
-    }
+    }*/
 
     Connections {
         target: qmlBridge
@@ -176,4 +235,5 @@ ApplicationWindow {
         window.x = Screen.width / 2 -window.width / 2
         window.y = Screen.height / 2 - window.height / 2
     }
+ }
 }
