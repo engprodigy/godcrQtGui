@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/KitlerUA/xlsxparser/parser"
 	"github.com/raedahgroup/godcr/app/config"
 
 	"github.com/therecipe/qt/core"
@@ -38,25 +37,25 @@ var opError error
 
 func main() {
 
-	var a = "initial"
-
+	//var a = "initial"
+	//load default configuration settings from godcr at package location "github.com/raedahgroup/godcr/app/config"
 	appConfig, args, parseroption, err := config.LoadConfig(true)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 
-	a = args.ConfFileOptions.AppDataDir
+	a := args.ConfFileOptions.AppDataDir //update string variable with value of default config file location
 
-	if appConfig != nil {
-		fmt.Println("unexpected command or flag in %s mode: %s\n")
-		//fmt.Fprintf(os.Stderr, "unexpected command or flag in %s mode: %s\n")
-		//os.Exit(1)
+	if appConfig == nil {
+
+		fmt.Fprintf(os.Stderr, "unexpected command or flag in %s mode: %s\n")
+		os.Exit(1)
 	}
 
 	if args.ConfFileOptions.AppDataDir == " " {
-		//fmt.Fprintf(os.Stderr, "unexpected command or flag in %s mode: %s\n")
-		//os.Exit(1)
+		fmt.Fprintf(os.Stderr, "unexpected command or flag in %s mode: %s\n")
+		os.Exit(1)
 	}
 	if parseroption == nil {
 		fmt.Fprintf(os.Stderr, "unexpected command or flag in %s mode: %s\n")
@@ -65,9 +64,6 @@ func main() {
 
 	conf := NewConfig(nil)
 	conf.SetName(a)
-	/*conf.ConnectNameChanged(func(n string) {
-		println("new name:", n)
-	})*/
 
 	var qmlBridge *QmlBridge
 	qmlBridge = NewQmlBridge(nil)
@@ -85,23 +81,22 @@ func main() {
 	// Create a QML application engine
 	engine := qml.NewQQmlApplicationEngine(nil)
 	engine.RootContext().SetContextProperty("qmlBridge", qmlBridge)
-	//engine.RootContext().SetContextProperty("Person", "setting")
-	/*context := engine.Context()
-	context.SetVar("person", &Person{Name: "Ale"})*/
 
+	//function to send data to qml
 	qmlBridge.ConnectSendToQml(func(detText string) {
 
 	})
+	//function to receive data from user input or activity on the gui
 	qmlBridge.ConnectSendToGo(func(fileName, dir string) {
-		var err error
-		var warnings string
-		if warnings, err = parser.Parse(fileName, dir); err != nil {
-			qmlBridge.SendToQml(fmt.Sprintf("%s<br>", err))
-		} else if warnings == "" {
-			qmlBridge.SendToQml("Successfully parsed and safe<br>")
-		} else {
-			qmlBridge.SendToQml(fmt.Sprintf("<b><i>Parsed with warnings:</i></b><br><br>%s", warnings))
-		}
+		/*	var err error
+			var warnings string
+			if warnings, err = parser.Parse(fileName, dir); err != nil {
+				qmlBridge.SendToQml(fmt.Sprintf("%s<br>", err))
+			} else if warnings == "" {
+				qmlBridge.SendToQml("Successfully parsed and safe<br>")
+			} else {
+				qmlBridge.SendToQml(fmt.Sprintf("<b><i>Parsed with warnings:</i></b><br><br>%s", warnings))
+			}*/
 	})
 	// Load the main qml file
 	engine.Load(core.NewQUrl3("qrc:/qml/main.qml", 0))
